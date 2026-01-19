@@ -1,0 +1,21 @@
+#lives{
+    align-self: center;
+    justify-self: center;
+    background: #ece8e8;
+    width: 250px;
+    height: 100px;
+    text-align: center;
+    border-radius: 15px;
+    opacity: 0;
+}
+#lives.appear{
+    display: block;
+    opacity: 1;
+    transition: opacity 2.0s ease-in;
+}
+#lives-box{
+    align-self: center;
+    justify-self: center;
+    font-size: 35px;
+    margin-top: -20px;
+}

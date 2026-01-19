@@ -162,54 +162,37 @@ class Quiz {
 
             // Wrapper for the boxes (outside the question container)
             const boxesWrapper = document.createElement("div");
-            boxesWrapper.style.display = "flex";
-            boxesWrapper.style.justifyContent = "space-around";
-            boxesWrapper.style.marginTop = "20px";
+            boxesWrapper.className = "color-boxes-wrapper"; // Mobile-friendly wrapper
 
             // RGB Box
             const rgbBox = document.createElement("div");
-            rgbBox.style.width = "250px";
-            rgbBox.style.height = "250px";
-            rgbBox.style.border = "3px solid #333";
-            rgbBox.style.display = "flex";
-            rgbBox.style.flexDirection = "column";
-            rgbBox.style.alignItems = "center";
-            rgbBox.style.justifyContent = "center";
+            rgbBox.className = "color-box";
             const rgbText = document.createElement("p");
             rgbText.textContent = "RGB(0,0,0)";
-            rgbText.style.marginBottom = "10px";
             rgbBox.appendChild(rgbText);
             boxesWrapper.appendChild(rgbBox);
 
             // CMY Box
             const cmyBox = document.createElement("div");
-            cmyBox.style.width = "250px";
-            cmyBox.style.height = "250px";
-            cmyBox.style.border = "3px solid #333";
-            cmyBox.style.display = "flex";
-            cmyBox.style.flexDirection = "column";
-            cmyBox.style.alignItems = "center";
-            cmyBox.style.justifyContent = "center";
+            cmyBox.className = "color-box";
             const cmyText = document.createElement("p");
             cmyText.textContent = "CMY(0,0,0)";
-            cmyText.style.marginBottom = "10px";
             cmyBox.appendChild(cmyText);
             boxesWrapper.appendChild(cmyBox);
 
+            // Append boxes to parent (outside container visually)
             setTimeout(() => {
                 if (container.parentElement) {
                     container.parentElement.appendChild(boxesWrapper);
                 }
             }, 0);
 
-            // RGB buttons (inside container, logically left)
+            // RGB buttons inside container
             const rgbBtnWrapper = document.createElement("div");
-            rgbBtnWrapper.style.display = "flex";
-            rgbBtnWrapper.style.justifyContent = "space-around";
+            rgbBtnWrapper.className = "btn-wrapper";
             ["r", "g", "b"].forEach(ch => {
                 const btn = document.createElement("button");
                 btn.textContent = ch.toUpperCase();
-                btn.style.margin = "2px";
                 btn.onclick = () => {
                     rgb[ch] = Math.min(255, rgb[ch] + 15);
                     rgbBox.style.backgroundColor = `rgb(${rgb.r},${rgb.g},${rgb.b})`;
@@ -219,15 +202,12 @@ class Quiz {
             });
             container.appendChild(rgbBtnWrapper);
 
-            // CMY buttons (inside container, logically right)
+            // CMY buttons inside container
             const cmyBtnWrapper = document.createElement("div");
-            cmyBtnWrapper.style.display = "flex";
-            cmyBtnWrapper.style.justifyContent = "space-around";
-            cmyBtnWrapper.style.marginTop = "10px";
+            cmyBtnWrapper.className = "btn-wrapper";
             ["c", "m", "y"].forEach(ch => {
                 const btn = document.createElement("button");
                 btn.textContent = ch.toUpperCase();
-                btn.style.margin = "2px";
                 btn.onclick = () => {
                     cmy[ch] = Math.min(100, cmy[ch] + 15);
                     const r = Math.round(255 * (1 - cmy.c / 100));
@@ -243,9 +223,9 @@ class Quiz {
             // Done button
             const doneBtn = document.createElement("button");
             doneBtn.textContent = "Done";
-            doneBtn.style.marginTop = "20px";
+            doneBtn.style.marginTop = "15px";
             doneBtn.onclick = () => {
-                boxesWrapper.remove();
+                boxesWrapper.remove(); // remove outside boxes
                 container.classList.remove("visible");
                 setTimeout(() => this.showNextQuestion(container.parentElement), 300);
             };
@@ -253,6 +233,7 @@ class Quiz {
 
             return container;
         }
+
         if (question.type === "special" && question.special === "hyperlink") {
             container.appendChild(qText);
 
@@ -317,6 +298,7 @@ class Quiz {
             container.appendChild(doneBtn);
             return container;
         }
+
 
         container.appendChild(qText);
 

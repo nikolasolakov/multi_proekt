@@ -263,4 +263,41 @@ button.active {
         flex-direction: column;
         align-items: center;
     }
+}@media screen and (max-width: 768px) {
+    /* Stack RGB and CMY vertically on mobile */
+    .question-container .color-btns {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .question-container div > div {
+        width: 100% !important; /* full width boxes */
+        max-width: 300px;
+        margin: 10px auto;
+    }
+
+    #quiz-container {
+        padding: 0 10px; /* small horizontal padding */
+    }
+
+    #lives-box {
+        gap: 5px;
+    }
+
+    #restart button,
+    #game-over-screen button {
+        font-size: 16px;
+        padding: 10px 20px;
+    }
+
+    .game-over-box {
+        padding: 30px 40px;
+    }
+}#lives, #restart {
+     z-index: 1000;
+  }
+
+/* Add padding top to quiz-wrapper so content doesn't go under fixed buttons */
+#game-wrapper {
+    padding-top: 100px; /* enough space for restart and lives */
 }

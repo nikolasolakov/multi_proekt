@@ -160,36 +160,41 @@ class Quiz {
             const rgb = { r: 0, g: 0, b: 0 };
             const cmy = { c: 0, m: 0, y: 0 };
 
-            // Wrapper for the boxes (outside the question container)
-            const boxesWrapper = document.createElement("div");
-            boxesWrapper.className = "color-boxes-wrapper"; // Mobile-friendly wrapper
+            // MAIN WRAPPER for boxes + buttons
+            const colorWrapper = document.createElement("div");
+            colorWrapper.style.display = "flex";
+            colorWrapper.style.justifyContent = "space-around"; // RGB left, CMY right
+            colorWrapper.style.alignItems = "flex-start";       // align top
+            colorWrapper.style.width = "100%";
+            colorWrapper.style.marginTop = "20px";
+            colorWrapper.style.flexWrap = "wrap";              // wrap on small screens
+
+            // ===== RGB Container =====
+            const rgbContainer = document.createElement("div");
+            rgbContainer.style.display = "flex";
+            rgbContainer.style.flexDirection = "column";
+            rgbContainer.style.alignItems = "center";
+            rgbContainer.style.margin = "10px";
 
             // RGB Box
             const rgbBox = document.createElement("div");
-            rgbBox.className = "color-box";
+            rgbBox.style.backgroundColor = "black";
+            rgbBox.style.width = "250px";
+            rgbBox.style.height = "250px";
+            rgbBox.style.border = "3px solid #333";
+            rgbBox.style.display = "flex";
+            rgbBox.style.flexDirection = "column";
+            rgbBox.style.alignItems = "center";
+            rgbBox.style.justifyContent = "center";
             const rgbText = document.createElement("p");
             rgbText.textContent = "RGB(0,0,0)";
+            rgbText.style.color = "white";
             rgbBox.appendChild(rgbText);
-            boxesWrapper.appendChild(rgbBox);
+            rgbContainer.appendChild(rgbBox);
 
-            // CMY Box
-            const cmyBox = document.createElement("div");
-            cmyBox.className = "color-box";
-            const cmyText = document.createElement("p");
-            cmyText.textContent = "CMY(0,0,0)";
-            cmyBox.appendChild(cmyText);
-            boxesWrapper.appendChild(cmyBox);
-
-            // Append boxes to parent (outside container visually)
-            setTimeout(() => {
-                if (container.parentElement) {
-                    container.parentElement.appendChild(boxesWrapper);
-                }
-            }, 0);
-
-            // RGB buttons inside container
+            // RGB Buttons
             const rgbBtnWrapper = document.createElement("div");
-            rgbBtnWrapper.className = "btn-wrapper";
+            rgbBtnWrapper.className = "color-btns";
             ["r", "g", "b"].forEach(ch => {
                 const btn = document.createElement("button");
                 btn.textContent = ch.toUpperCase();
@@ -200,11 +205,34 @@ class Quiz {
                 };
                 rgbBtnWrapper.appendChild(btn);
             });
-            container.appendChild(rgbBtnWrapper);
+            rgbContainer.appendChild(rgbBtnWrapper);
 
-            // CMY buttons inside container
+            colorWrapper.appendChild(rgbContainer);
+
+            // ===== CMY Container =====
+            const cmyContainer = document.createElement("div");
+            cmyContainer.style.display = "flex";
+            cmyContainer.style.flexDirection = "column";
+            cmyContainer.style.alignItems = "center";
+            cmyContainer.style.margin = "10px";
+
+            // CMY Box
+            const cmyBox = document.createElement("div");
+            cmyBox.style.width = "250px";
+            cmyBox.style.height = "250px";
+            cmyBox.style.border = "3px solid #333";
+            cmyBox.style.display = "flex";
+            cmyBox.style.flexDirection = "column";
+            cmyBox.style.alignItems = "center";
+            cmyBox.style.justifyContent = "center";
+            const cmyText = document.createElement("p");
+            cmyText.textContent = "CMY(0,0,0)";
+            cmyBox.appendChild(cmyText);
+            cmyContainer.appendChild(cmyBox);
+
+            // CMY Buttons
             const cmyBtnWrapper = document.createElement("div");
-            cmyBtnWrapper.className = "btn-wrapper";
+            cmyBtnWrapper.className = "color-btns";
             ["c", "m", "y"].forEach(ch => {
                 const btn = document.createElement("button");
                 btn.textContent = ch.toUpperCase();
@@ -218,14 +246,18 @@ class Quiz {
                 };
                 cmyBtnWrapper.appendChild(btn);
             });
-            container.appendChild(cmyBtnWrapper);
+            cmyContainer.appendChild(cmyBtnWrapper);
+
+            colorWrapper.appendChild(cmyContainer);
+
+            // Append wrapper to container
+            container.appendChild(colorWrapper);
 
             // Done button
             const doneBtn = document.createElement("button");
             doneBtn.textContent = "Done";
-            doneBtn.style.marginTop = "15px";
+            doneBtn.style.marginTop = "20px";
             doneBtn.onclick = () => {
-                boxesWrapper.remove(); // remove outside boxes
                 container.classList.remove("visible");
                 setTimeout(() => this.showNextQuestion(container.parentElement), 300);
             };
@@ -233,6 +265,7 @@ class Quiz {
 
             return container;
         }
+
 
         if (question.type === "special" && question.special === "hyperlink") {
             container.appendChild(qText);

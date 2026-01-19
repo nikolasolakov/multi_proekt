@@ -433,14 +433,15 @@ function removeLife() {
     }
     if (game.lives <= 0) setTimeout(showGameOver, 400);
 }
-
 function showGameOver() {
-    document.getElementById("game-over-screen").classList.remove("hidden");
+    const screen = document.getElementById("game-over-screen");
+    screen.classList.add("show");  // show overlay
     if (backgroundAudio) backgroundAudio.pause();
 }
 
 function restartGame() {
-    document.getElementById("game-over-screen").classList.add("hidden");
+    const screen = document.getElementById("game-over-screen");
+    screen.classList.remove("show"); // hide overlay
     if (backgroundAudio) {
         backgroundAudio.pause();
         backgroundAudio.remove();

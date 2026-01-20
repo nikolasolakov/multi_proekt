@@ -1,4 +1,4 @@
-let backgroundAudio = null; // single audio instance for special questions
+let backgroundAudio = null;
 
 class Question {
     constructor(text, answers, options = {}) {
@@ -12,6 +12,20 @@ class Question {
             : null;
     }
 
+    checkMultipleChoice(selectedAnswers, context) {
+        const correct = new Set(this.correctAnswer);
+        const selected = new Set(selectedAnswers);
+
+        // Must match EXACTLY
+        const allCorrectSelected =
+            correct.size === selected.size &&
+            [...correct].every(a => selected.has(a));
+
+        if (!allCorrectSelected) {
+            context.removeLife();
+        }
+    }
+
     selectAnswer(answer, context) {
         switch (this.type) {
             case "life":
@@ -20,6 +34,11 @@ class Question {
             case "flag":
                 context.flags.push([this.flag.type, answer]);
                 break;
+            case "multipleChoice":
+
+                break;
+            case "none":
+            default: break;
         }
     }
 }
@@ -70,10 +89,21 @@ class Quiz {
                 qText.classList.add(value);
             }
         });
+        // APPLY MOVING TEXT FLAG
+        // APPLY PERSISTENT TEXT EFFECTS
+        this.context.flags.forEach(([type, value]) => {
+            if (type === "movingText" && value === true) {
+                qText.classList.add("moving-text");
+            }
+            if (type === "variatingText" && value === true) {
+                qText.classList.add("variating-text");
+            }
+        });
 
-        /* ======================
-           SPECIAL: VOLUME
-        ====================== */
+
+
+
+
         if (question.type === "special" && question.special === "volume") {
             container.appendChild(qText);
 
@@ -109,10 +139,6 @@ class Quiz {
 
             return container;
         }
-
-        /* ======================
-           SPECIAL: TEXT STYLE
-        ====================== */
         if (question.type === "special" && question.special === "textStyle") {
             container.appendChild(qText);
 
@@ -265,8 +291,6 @@ class Quiz {
 
             return container;
         }
-
-
         if (question.type === "special" && question.special === "hyperlink") {
             container.appendChild(qText);
 
@@ -332,6 +356,209 @@ class Quiz {
             return container;
         }
 
+        if (question.type === "special" && question.special === "movingText") {
+            container.appendChild(qText);
+
+            // Apply movement ONLY for this question initially
+            qText.classList.add("moving-text");
+
+            let selected = null;
+
+            question.answers.forEach(answer => {
+                const btn = document.createElement("button");
+                btn.textContent = answer;
+
+                btn.onclick = () => {
+                    selected = answer;
+                    [...container.querySelectorAll("button")].forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                };
+
+                container.appendChild(btn);
+            });
+
+            const doneBtn = document.createElement("button");
+            doneBtn.textContent = "Done";
+            doneBtn.style.marginTop = "20px";
+
+            doneBtn.onclick = () => {
+                if (!selected) {
+                    alert("Избери одговор 🙂");
+                    return;
+                }
+
+                if (selected === "текст што се движи е лесен за читање") {
+                    this.context.flags.push(["movingText", true]);
+                    this.context.removeLife();
+                }
+
+
+                container.classList.remove("visible");
+                setTimeout(() => this.showNextQuestion(container.parentElement), 300);
+            };
+
+            container.appendChild(doneBtn);
+            return container;
+        }
+
+        if (question.type === "special" && question.special === "variatingText") {
+            container.appendChild(qText);
+
+            // Apply size variation ONLY for this question initially
+            qText.classList.add("variating-text");
+
+            let selected = null;
+
+            question.answers.forEach(answer => {
+                const btn = document.createElement("button");
+                btn.textContent = answer;
+
+                btn.onclick = () => {
+                    selected = answer;
+                    [...container.querySelectorAll("button")].forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                };
+
+                container.appendChild(btn);
+            });
+
+            const doneBtn = document.createElement("button");
+            doneBtn.textContent = "Done";
+            doneBtn.style.marginTop = "20px";
+
+            doneBtn.onclick = () => {
+                if (!selected) {
+                    alert("Избери одговор 🙂");
+                    return;
+                }
+
+                // WRONG belief → permanent font-size variation
+                if (selected === "Текст што варира во големина е лесен за читање") {
+                    this.context.flags.push(["variatingText", true]);
+                }
+
+                container.classList.remove("visible");
+                setTimeout(() => this.showNextQuestion(container.parentElement), 300);
+            };
+
+            container.appendChild(doneBtn);
+            return container;
+        }
+
+        if (question.type === "special" && question.special === "imageChoice") {
+            container.appendChild(qText);
+
+            const grid = document.createElement("div");
+            grid.className = "image-grid";
+
+            const selected = new Set();
+
+            question.answers.forEach((answer, index) => {
+                const option = document.createElement("div");
+                option.className = "image-option";
+
+                // Image
+                const img = document.createElement("img");
+                img.src = answer.img;
+                img.alt = answer.label;
+                option.appendChild(img);
+
+                // Label text under the image
+                const label = document.createElement("p");
+                label.textContent = answer.label;
+                label.style.textAlign = "center";
+                label.style.marginTop = "8px";
+                label.style.fontWeight = "normal";
+                option.appendChild(label);
+
+                option.onclick = () => {
+                    if (selected.has(index)) {
+                        selected.delete(index);
+                        option.classList.remove("selected");
+                    } else {
+                        selected.add(index);
+                        option.classList.add("selected");
+                    }
+                };
+
+                grid.appendChild(option);
+            });
+
+            container.appendChild(grid);
+
+            const doneBtn = document.createElement("button");
+            doneBtn.textContent = "Done";
+            doneBtn.style.marginTop = "20px";
+
+            doneBtn.onclick = () => {
+                if (selected.size === 0) {
+                    alert("Избери барем една слика 🙂");
+                    return;
+                }
+
+                let allCorrect = true;
+
+                question.answers.forEach((answer, index) => {
+                    const isSelected = selected.has(index);
+                    if ((answer.correct && !isSelected) || (!answer.correct && isSelected)) {
+                        allCorrect = false;
+                    }
+                });
+
+                if (!allCorrect) removeLife();
+
+                container.classList.remove("visible");
+                setTimeout(() => this.showNextQuestion(container.parentElement), 300);
+            };
+
+            container.appendChild(doneBtn);
+            return container;
+        }
+
+
+
+        if (question.type === "multipleChoice") {
+            container.appendChild(qText);
+
+            const selected = new Set();
+
+            question.answers.forEach(answer => {
+                const btn = document.createElement("button");
+                btn.textContent = answer;
+
+                btn.onclick = () => {
+                    if (selected.has(answer)) {
+                        selected.delete(answer);
+                        btn.classList.remove("active");
+                    } else {
+                        selected.add(answer);
+                        btn.classList.add("active");
+                    }
+                };
+
+                container.appendChild(btn);
+            });
+
+            const doneBtn = document.createElement("button");
+            doneBtn.textContent = "Done";
+            doneBtn.style.marginTop = "20px";
+
+            doneBtn.onclick = () => {
+                if (selected.size === 0) {
+                    alert("Select at least one answer!");
+                    return;
+                }
+
+                question.checkMultipleChoice([...selected], this.context);
+
+                container.classList.remove("visible");
+                setTimeout(() => this.showNextQuestion(container.parentElement), 300);
+            };
+
+            container.appendChild(doneBtn);
+            return container;
+        }
+
 
         container.appendChild(qText);
 
@@ -379,6 +606,7 @@ const game = {
 };
 
 const questions = [
+
     new Question("Каква боја сакаш да ти е позадината на прашањата?", ["Бела", "Жолта", "Плава", "Розева", "Црна"], { type: "flag", flagType: "color" }),
     new Question("Каква боја сакаш да ти е позадината?", ["Бела", "Жолта", "Плава", "Розева", "Црна"], { type: "flag", flagType: "BGcolor" }),
     new Question("Каква боја сакаш да ти е текстот?", ["Бела", "Жолта", "Плава", "Розева", "Црна"], { type: "flag", flagType: "textColor" }),
@@ -390,11 +618,38 @@ const questions = [
     new Question("Што ја прави дигиталната содржина интерактивна? ", ["Кликање", "Бирање опции", "гледање", "слушање музика"], { correctAnswer: "Бирање опции", type: "life" }),
     new Question("Дали само гледаш – или учествуваш? ", ["Гледам", "Учествувам"], { type: "none" }),
     new Question(
-        "Кое од овие овозможува брзо пребарување и интерактивно читање? (hint: дупли клик ќе ти помогне)",
+        "Кое од овие овозможува брзо пребарување и интерактивно читање? (hint: двоен клик ќе ти помогне)",
         ["Хиперлинк", "Обична веб страна", "Тетратка", "Манга"],
         { type: "special", special: "hyperlink" }
     ),
-
+    new Question(
+        "Фонт претставува елемент од фамилија фонтови со?",
+        ["Големина", "Стил", "Тежина", "Резолуција", "Позиција"],
+        {
+            type: "multipleChoice",
+            correctAnswer: ["Големина", "Стил", "Тежина"]
+        }
+    ),
+    new Question(
+        "Што од ова е точно за текст:",
+        ["текст што се движи е лесен за читање", "текст што се движи е тежок за читање"],
+        { type: "special", special: "movingText" }
+    ),
+    new Question(
+        "Што од ова е точно за текст:",
+        ["Текст што варира во големина е лесен за читање", "текст што не варира е лесен за читање"],
+        { type: "special", special: "variatingText" }
+    ),
+    new Question(
+        "Koe од понудените е пример за линеарна мултимедија? ",
+        [
+            { label: "ЦД", img: "images/cds.jpg", correct: false },
+            { label: "Виртуелна реалност", img: "images/vr.jpg", correct: false },
+            { label: "видео", img: "images/video.jpg", correct: true },
+            { label: "текст", img: "images/text.jpg", correct: true }
+        ],
+        { type: "special", special: "imageChoice" }
+    ),
 
 
 

@@ -16,7 +16,6 @@ class Question {
         const correct = new Set(this.correctAnswer);
         const selected = new Set(selectedAnswers);
 
-        // Must match EXACTLY
         const allCorrectSelected =
             correct.size === selected.size &&
             [...correct].every(a => selected.has(a));
@@ -89,8 +88,7 @@ class Quiz {
                 qText.classList.add(value);
             }
         });
-        // APPLY MOVING TEXT FLAG
-        // APPLY PERSISTENT TEXT EFFECTS
+        // SPECIAL TEXT FLAGS
         this.context.flags.forEach(([type, value]) => {
             if (type === "movingText" && value === true) {
                 qText.classList.add("moving-text");
@@ -103,7 +101,7 @@ class Quiz {
 
 
 
-
+        //SPECIAL QUESTION TYPES
         if (question.type === "special" && question.special === "volume") {
             container.appendChild(qText);
 
@@ -186,23 +184,21 @@ class Quiz {
             const rgb = { r: 0, g: 0, b: 0 };
             const cmy = { c: 0, m: 0, y: 0 };
 
-            // MAIN WRAPPER for boxes + buttons
             const colorWrapper = document.createElement("div");
             colorWrapper.style.display = "flex";
-            colorWrapper.style.justifyContent = "space-around"; // RGB left, CMY right
-            colorWrapper.style.alignItems = "flex-start";       // align top
+            colorWrapper.style.justifyContent = "space-around";
+            colorWrapper.style.alignItems = "flex-start";
             colorWrapper.style.width = "100%";
             colorWrapper.style.marginTop = "20px";
-            colorWrapper.style.flexWrap = "wrap";              // wrap on small screens
+            colorWrapper.style.flexWrap = "wrap";
 
-            // ===== RGB Container =====
             const rgbContainer = document.createElement("div");
             rgbContainer.style.display = "flex";
             rgbContainer.style.flexDirection = "column";
             rgbContainer.style.alignItems = "center";
             rgbContainer.style.margin = "10px";
 
-            // RGB Box
+
             const rgbBox = document.createElement("div");
             rgbBox.style.backgroundColor = "black";
             rgbBox.style.width = "250px";
@@ -218,7 +214,6 @@ class Quiz {
             rgbBox.appendChild(rgbText);
             rgbContainer.appendChild(rgbBox);
 
-            // RGB Buttons
             const rgbBtnWrapper = document.createElement("div");
             rgbBtnWrapper.className = "color-btns";
             ["r", "g", "b"].forEach(ch => {
@@ -235,14 +230,13 @@ class Quiz {
 
             colorWrapper.appendChild(rgbContainer);
 
-            // ===== CMY Container =====
+
             const cmyContainer = document.createElement("div");
             cmyContainer.style.display = "flex";
             cmyContainer.style.flexDirection = "column";
             cmyContainer.style.alignItems = "center";
             cmyContainer.style.margin = "10px";
 
-            // CMY Box
             const cmyBox = document.createElement("div");
             cmyBox.style.width = "250px";
             cmyBox.style.height = "250px";
@@ -256,7 +250,6 @@ class Quiz {
             cmyBox.appendChild(cmyText);
             cmyContainer.appendChild(cmyBox);
 
-            // CMY Buttons
             const cmyBtnWrapper = document.createElement("div");
             cmyBtnWrapper.className = "color-btns";
             ["c", "m", "y"].forEach(ch => {
@@ -276,10 +269,8 @@ class Quiz {
 
             colorWrapper.appendChild(cmyContainer);
 
-            // Append wrapper to container
             container.appendChild(colorWrapper);
 
-            // Done button
             const doneBtn = document.createElement("button");
             doneBtn.textContent = "Done";
             doneBtn.style.marginTop = "20px";
@@ -296,7 +287,6 @@ class Quiz {
 
             let selectedAnswer = null;
 
-            // Ensure correct answer is set
             if (!question.correctAnswer) question.correctAnswer = "Хиперлинк";
 
             const answerButtons = question.answers.map(answer => {
@@ -304,19 +294,16 @@ class Quiz {
                 btn.textContent = answer;
 
                 btn.addEventListener("click", () => {
-                    selectedAnswer = answer;               // save the answer
-                    // remove "active" from all buttons
+                    selectedAnswer = answer;
                     answerButtons.forEach(b => b.classList.remove("active"));
-                    // add "active" to the clicked button
                     btn.classList.add("active");
                 });
 
 
-                // Double click → open hyperlink if this is the hyperlink option
                 if (answer === "Хиперлинк") {
                     const url = "https://en.wikipedia.org/wiki/Hyperlink";
                     btn.addEventListener("dblclick", e => {
-                        e.stopPropagation(); // prevent single-click select
+                        e.stopPropagation();
                         window.open(url, "_blank");
                     });
                 }
@@ -325,24 +312,20 @@ class Quiz {
                 return btn;
             });
 
-            // Done button
             const doneBtn = document.createElement("button");
             doneBtn.textContent = "Done";
             doneBtn.style.marginTop = "20px";
 
             doneBtn.addEventListener("click", () => {
                 if (!selectedAnswer) {
-                    alert("Please select an answer before clicking Done!");
+                    alert("Избери одговор 🙂");
                     return;
                 }
 
-                // Check if there is a correct answer for this question
                 if (question.correctAnswer && selectedAnswer !== question.correctAnswer) {
-                    // manually remove a life
                     if (this.context.removeLife) this.context.removeLife();
                 }
 
-                // Optionally save the selected answer in context if needed
                 if (this.context.flags && question.type === "flag") {
                     this.context.flags.push([question.flag?.type, selectedAnswer]);
                 }
@@ -355,11 +338,9 @@ class Quiz {
             container.appendChild(doneBtn);
             return container;
         }
-
         if (question.type === "special" && question.special === "movingText") {
             container.appendChild(qText);
 
-            // Apply movement ONLY for this question initially
             qText.classList.add("moving-text");
 
             let selected = null;
@@ -400,11 +381,9 @@ class Quiz {
             container.appendChild(doneBtn);
             return container;
         }
-
         if (question.type === "special" && question.special === "variatingText") {
             container.appendChild(qText);
 
-            // Apply size variation ONLY for this question initially
             qText.classList.add("variating-text");
 
             let selected = null;
@@ -432,7 +411,6 @@ class Quiz {
                     return;
                 }
 
-                // WRONG belief → permanent font-size variation
                 if (selected === "Текст што варира во големина е лесен за читање") {
                     this.context.flags.push(["variatingText", true]);
                 }
@@ -444,7 +422,6 @@ class Quiz {
             container.appendChild(doneBtn);
             return container;
         }
-
         if (question.type === "special" && question.special === "imageChoice") {
             container.appendChild(qText);
 
@@ -457,13 +434,11 @@ class Quiz {
                 const option = document.createElement("div");
                 option.className = "image-option";
 
-                // Image
                 const img = document.createElement("img");
                 img.src = answer.img;
                 img.alt = answer.label;
                 option.appendChild(img);
 
-                // Label text under the image
                 const label = document.createElement("p");
                 label.textContent = answer.label;
                 label.style.textAlign = "center";
@@ -514,8 +489,48 @@ class Quiz {
             container.appendChild(doneBtn);
             return container;
         }
+        if (question.type === "special" && question.special === "fontSizeLife") {
+            container.appendChild(qText);
 
+            let selected = null;
 
+            question.answers.forEach(answer => {
+                const btn = document.createElement("button");
+                btn.textContent = answer;
+                btn.style.fontSize = answer;
+                btn.style.margin = "5px";
+                btn.style.padding = "10px 20px";
+
+                btn.onclick = () => {
+                    selected = answer;
+                    [...container.querySelectorAll("button")].forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                };
+
+                container.appendChild(btn);
+            });
+
+            const doneBtn = document.createElement("button");
+            doneBtn.textContent = "Done";
+            doneBtn.style.marginTop = "20px";
+
+            doneBtn.onclick = () => {
+                if (!selected) {
+                    alert("Избери одговор 🙂");
+                    return;
+                }
+
+                if (selected !== question.correctAnswer) {
+                    if (this.context.removeLife) this.context.removeLife();
+                }
+
+                container.classList.remove("visible");
+                setTimeout(() => this.showNextQuestion(container.parentElement), 300);
+            };
+
+            container.appendChild(doneBtn);
+            return container;
+        }
 
         if (question.type === "multipleChoice") {
             container.appendChild(qText);
@@ -545,7 +560,7 @@ class Quiz {
 
             doneBtn.onclick = () => {
                 if (selected.size === 0) {
-                    alert("Select at least one answer!");
+                    alert("Избери одговор 🙂");
                     return;
                 }
 
@@ -605,9 +620,7 @@ class Quiz {
     }
 }
 
-/* ======================
-   GAME CONTEXT
-====================== */
+
 const game = {
     lives: 3,
     flags: [],
@@ -615,16 +628,15 @@ const game = {
 };
 
 const questions = [
-    new Question("Каква боја сакаш да ти е позадината на прашањата?", ["Бела", "Жолта", "Плава", "Розева", "Црна"], { type: "flag", flagType: "color" }),
-    new Question("Каква боја сакаш да ти е позадината?", ["Бела", "Жолта", "Плава", "Розева", "Црна"], { type: "flag", flagType: "BGcolor" }),
-    new Question("Каква боја сакаш да ти е текстот?", ["Бела", "Жолта", "Плава", "Розева", "Црна"], { type: "flag", flagType: "textColor" }),
-    new Question("Смени гласноста на звукот:", [], { type: "special", special: "volume" }),
-    new Question("Боите се основни за визуелно доживување поради реакциите на фото-рецепторите во човечкото око " +
-        ", еве некои модели на боја кои постојат. RGB е адитивен модел, белата се добива со присуство на сите, додека CMY е суптрактивен, белата е отсуството на сите:", [], { type: "special", special: "colorModels" }),
-    new Question("Каков стил сакаш да ти има текстот?", [], { type: "special", special: "textStyle" }),
     new Question("Кое од следниве најдобро опишува интерактивна содржина?", ["Гледање видео на слушалки", "решавање онлајн квиз со кликање одговори", "powerpoint презентација што сама се менува", "гледање филм во кино"], { correctAnswer: "решавање онлајн квиз со кликање одговори", type: "life" }),
     new Question("Што ја прави дигиталната содржина интерактивна? ", ["Кликање", "Бирање опции", "гледање", "слушање музика"], { correctAnswer: "Бирање опции", type: "life" }),
     new Question("Дали само гледаш – или учествуваш? ", ["Гледам", "Учествувам"], { type: "none" }),
+    new Question("Боите се основни за визуелно доживување поради реакциите на фото-рецепторите во човечкото око " +
+        ", еве некои модели на боја кои постојат. RGB е адитивен модел, белата се добива со присуство на сите, додека CMY е суптрактивен, белата е отсуството на сите:", [], { type: "special", special: "colorModels" }),
+
+    new Question("Каква боја сакаш да ти е позадината?", ["Бела", "Жолта", "Плава", "Розева", "Црна"], { type: "flag", flagType: "BGcolor" }),
+    new Question("Каква боја сакаш да ти е позадината на прашањата?", ["Бела", "Жолта", "Плава", "Розева", "Црна"], { type: "flag", flagType: "color" }),
+    new Question("Каква боја сакаш да ти е текстот?", ["Бела", "Жолта", "Плава", "Розева", "Црна"], { type: "flag", flagType: "textColor" }),
     new Question(
         "Кое од овие овозможува брзо пребарување и интерактивно читање? (hint: двоен клик ќе ти помогне)",
         ["Хиперлинк", "Обична веб страна", "Тетратка", "Манга"],
@@ -637,6 +649,12 @@ const questions = [
             type: "multipleChoice",
             correctAnswer: ["Големина", "Стил", "Тежина"]
         }
+    ),
+    new Question("Каков стил сакаш да ти има текстот?", [], { type: "special", special: "textStyle" }),
+    new Question(
+        "Која големина на фонт во пиксели е стандардно лесна за читање?",
+        ["5px", "12px", "20px", "50px"],
+        { type: "special", special: "fontSizeLife", correctAnswer: "20px" }
     ),
     new Question(
         "Што од ова е точно за текст:",
@@ -658,11 +676,47 @@ const questions = [
         ],
         { type: "special", special: "imageChoice" }
     ),
+
+
+
+
+    //TODO PRASHANJA ZA ZVUK
+
+    new Question("Смени гласноста на звукот:", [], { type: "special", special: "volume" }),
+
+
+
+
+
+
     new Question("Успешно направи мултимедијален квиз! Сега неколку прашања да го испробаш твојот квиз", ["продолжи"], { type: "none" }),
 
 
-    new Question("What is 2+2?", ["3", "4"], { correctAnswer: "4", type: "life" }),
-    new Question("Say hi!", ["Hi", "Hello"], { type: "none" })
+
+
+
+    new Question(
+        "Од кои фази се состои DDDE моделот? ",
+        ["Decide",  "Develop", "Documentation", "Debugging","Evaluate", "Exploration","Design", "Experimentation"],
+        {
+            type: "multipleChoice",
+            correctAnswer: ["Decide", "Design", "Develop", "Evaluate"]
+        }
+    ),
+    new Question(
+        "Koи спаѓаат во фазата развој во ддде моделот? ",
+        [
+            { label: "Графика", img: "images/graphic.jpg", correct: true },
+            { label: "Анимација", img: "images/animation.jpg", correct: true },
+            { label: "Видео", img: "images/video.jpg", correct: true },
+            { label: "Аудио", img: "images/audio.jpg", correct: true }
+        ],
+        { type: "special", special: "imageChoice" }
+    ),
+    new Question("Видеото може да комбинира текст, звук и анимација", ["Точно", "Неточно"], { correctAnswer: "Точно", type: "life" }),
+    new Question("Подолго видео секогаш е подобро и подетално", ["Точно", "Неточно"], { correctAnswer: "Неточно", type: "life" }),
+    new Question("Видеото претставува технологија за снимање, обработка, складирање, пренос и реконструкција на серии фотографии кои претставуваат сцени во движење", ["Точно", "Неточно"], { correctAnswer: "Точно", type: "life" })
+
 ];
 
 const quiz = new Quiz(questions, game);
@@ -702,6 +756,7 @@ function showGameOver() {
     if (backgroundAudio) backgroundAudio.pause();
 }
 
+
 function restartGame() {
     const screen = document.getElementById("game-over-screen");
     screen.classList.remove("show"); // hide overlay
@@ -714,12 +769,11 @@ function restartGame() {
 }
 
 
-
+//ukrasi
 function launchConfetti() {
     const canvas = document.getElementById("confetti-canvas");
     const myConfetti = confetti.create(canvas, { resize: true, useWorker: true });
 
-    // Fire multiple bursts
     myConfetti({
         particleCount: 300,
         spread: 250,

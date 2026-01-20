@@ -10,39 +10,89 @@
     padding: 20px 10px 10px 10px;
     box-sizing: border-box;
 }
+/* ----------------------
+   GAME OVER SCREEN PRETTY
+----------------------- */
 #game-over-screen {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.8);
-    display: none; /* hidden by default */
+    background: rgba(0, 0, 0, 0.85); /* darker overlay */
+    display: none;
     align-items: center;
     justify-content: center;
     z-index: 9999;
+    flex-direction: column;
+    padding: 20px;
+    animation: fadeIn 0.5s ease-in-out;
 }
 
 #game-over-screen.show {
-    display: flex; /* show when needed */
+    display: flex;
 }
 
 .game-over-box {
-    background: #111;
-    color: white;
-    padding: 40px 60px;
+    background: linear-gradient(145deg, #1e1e1e, #111); /* subtle gradient */
+    color: #fff;
+    padding: 50px 70px;
     text-align: center;
-    border-radius: 12px;
+    border-radius: 20px;
     width: 600px;
     max-width: 90%;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+    border: 2px solid #6c5ce7;
+    transform: scale(0.9);
+    animation: popIn 0.5s forwards;
 }
 
 .game-over-box h1 {
-    font-size: 60px;
+    font-size: 64px;
     margin-bottom: 20px;
+    text-shadow: 2px 2px 8px rgba(108, 92, 231, 0.6);
+    background: linear-gradient(90deg, #ff0a54, #6c5ce7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.game-over-box p {
+    font-size: 24px;
+    margin-bottom: 30px;
+    color: #ddd;
 }
 
 .game-over-box button {
     font-size: 28px;
     padding: 20px 50px;
+    border-radius: 12px;
+    border: none;
+    background: #6c5ce7;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(108,92,231,0.5);
 }
+
+.game-over-box button:hover {
+    transform: scale(1.08);
+    background: #a29bfe;
+    box-shadow: 0 12px 25px rgba(108,92,231,0.7);
+}
+
+.game-over-box button:active {
+    transform: scale(0.95);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.7); opacity: 0; }
+    60% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); }
+}
+
 /* ----------------------
    QUESTION CONTAINER
 ----------------------- */

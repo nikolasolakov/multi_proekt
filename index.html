@@ -12,12 +12,10 @@
 <body id="body">
 <div id="game-wrapper">
 
-    <!-- Restart button top-left -->
     <div id="restart">
         <button onclick="restartGame()">Restart Game</button>
     </div>
 
-    <!-- Lives top-right -->
     <div id="lives">
         <h1>LIVES LEFT</h1>
         <div id="lives-box">
@@ -27,16 +25,16 @@
         </div>
     </div>
 
-    <!-- Quiz questions centered -->
     <div id="quiz-container"></div>
 
-    <!-- Game over screen -->
-    <div id="game-over-screen" class="hidden">
+    <div id="game-over-screen">
         <div class="game-over-box">
-            <h1>Game Over</h1>
-            <button onclick="restartGame()">Restart</button>
+            <h1>GAME OVER</h1>
+            <p>Сите животи се потрошени!</p>
+            <button onclick="restartGame()">Restart?</button>
         </div>
     </div>
+
 
 </div>
 

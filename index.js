@@ -643,7 +643,7 @@ const questions = [
         { type: "special", special: "hyperlink" }
     ),
     new Question(
-        "Фонт претставува елемент од фамилија фонтови со?",
+        "Фонт претставува елемент од фамилија фонтови со? Избери ги сите точни одговори:",
         ["Големина", "Стил", "Тежина", "Резолуција", "Позиција"],
         {
             type: "multipleChoice",
@@ -654,7 +654,7 @@ const questions = [
     new Question(
         "Која големина на фонт во пиксели е стандардно лесна за читање?",
         ["5px", "12px", "20px", "50px"],
-        { type: "special", special: "fontSizeLife", correctAnswer: "20px" }
+        { type: "special", special: "fontSizeLife", correctAnswer: "12px" }
     ),
     new Question(
         "Што од ова е точно за текст:",
@@ -667,7 +667,7 @@ const questions = [
         { type: "special", special: "variatingText" }
     ),
     new Question(
-        "Koe од понудените е пример за линеарна мултимедија? ",
+        "Koe од понудените е пример за линеарна мултимедија? Избери ги сите точни одговори:",
         [
             { label: "ЦД", img: "images/cds.jpg", correct: false },
             { label: "Виртуелна реалност", img: "images/vr.jpg", correct: false },
@@ -696,7 +696,7 @@ const questions = [
 
 
     new Question(
-        "Од кои фази се состои DDDE моделот? ",
+        "Од кои фази се состои DDDE моделот? Избери ги сите точни одговори:",
         ["Decide",  "Develop", "Documentation", "Debugging","Evaluate", "Exploration","Design", "Experimentation"],
         {
             type: "multipleChoice",
@@ -704,7 +704,7 @@ const questions = [
         }
     ),
     new Question(
-        "Koи спаѓаат во фазата развој во ддде моделот? ",
+        "Koи спаѓаат во фазата развој во ддде моделот? Избери ги сите точни одговори:",
         [
             { label: "Графика", img: "images/graphic.jpg", correct: true },
             { label: "Анимација", img: "images/animation.jpg", correct: true },

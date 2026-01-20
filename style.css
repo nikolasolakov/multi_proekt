@@ -148,9 +148,10 @@
 }
 
 button.active {
+    border-width: 3px;
     background-color: #ccc;
     color: #000;
-    border-color: #999;
+    border-color: #2a7dec;
 }
 
 /* ----------------------

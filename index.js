@@ -584,11 +584,20 @@ class Quiz {
 
         if (!q) {
             const end = document.createElement("p");
-            end.textContent = "Quiz Finished!";
+            end.style.fontSize = "50px";
+            end.style.textAlign = "center";
+            end.style.marginTop = "100px";
+            end.textContent = "Стигна до крајот на квизот! Благодарам што играше!";
             end.className = "question-container visible";
             parent.appendChild(end);
+
+            // Launch real-looking confetti
+            launchConfetti();
+
             return;
         }
+
+
 
         const container = this.createQuestionContainer(q);
         parent.appendChild(container);
@@ -606,7 +615,6 @@ const game = {
 };
 
 const questions = [
-
     new Question("Каква боја сакаш да ти е позадината на прашањата?", ["Бела", "Жолта", "Плава", "Розева", "Црна"], { type: "flag", flagType: "color" }),
     new Question("Каква боја сакаш да ти е позадината?", ["Бела", "Жолта", "Плава", "Розева", "Црна"], { type: "flag", flagType: "BGcolor" }),
     new Question("Каква боја сакаш да ти е текстот?", ["Бела", "Жолта", "Плава", "Розева", "Црна"], { type: "flag", flagType: "textColor" }),
@@ -650,7 +658,7 @@ const questions = [
         ],
         { type: "special", special: "imageChoice" }
     ),
-
+    new Question("Успешно направи мултимедијален квиз! Сега неколку прашања да го испробаш твојот квиз", ["продолжи"], { type: "none" }),
 
 
     new Question("What is 2+2?", ["3", "4"], { correctAnswer: "4", type: "life" }),
@@ -703,4 +711,19 @@ function restartGame() {
         backgroundAudio = null;
     }
     startGame();
+}
+
+
+
+function launchConfetti() {
+    const canvas = document.getElementById("confetti-canvas");
+    const myConfetti = confetti.create(canvas, { resize: true, useWorker: true });
+
+    // Fire multiple bursts
+    myConfetti({
+        particleCount: 300,
+        spread: 250,
+        origin: { y: 0.6 },
+        colors: ['#ff0a54','#ff477e','#ff7096','#ff85a1','#fbb1b9','#f9bec7','#f7cad0','#fae0e4']
+    });
 }

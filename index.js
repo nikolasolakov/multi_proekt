@@ -1,4 +1,8 @@
 let backgroundAudio = null;
+let lifeSound = null;
+let correctSound = null;
+let masterVolume = 0.5;
+
 
 class Question {
     constructor(text, answers, options = {}) {
@@ -22,13 +26,28 @@ class Question {
 
         if (!allCorrectSelected) {
             context.removeLife();
+        } else {
+            if (correctSound) {
+                correctSound.currentTime = 0;
+                correctSound.volume = 0.2;
+                correctSound.play();
+            }
         }
+
     }
 
     selectAnswer(answer, context) {
         switch (this.type) {
             case "life":
-                if (answer !== this.correctAnswer) context.removeLife();
+                if (answer === this.correctAnswer) {
+                    if (correctSound) {
+                        correctSound.currentTime = 0;
+                        correctSound.volume = 0.2;
+                        correctSound.play();
+                    }
+                } else {
+                    context.removeLife();
+                }
                 break;
             case "flag":
                 context.flags.push([this.flag.type, answer]);
@@ -80,9 +99,17 @@ class Quiz {
             }
 
             if (type === "textColor") {
-                qText.style.color =
-                    { "Бела": "white", "Жолта": "yellow", "Плава": "lightblue", "Розева": "pink", "Црна": "black" }[value];
+                const colorMap = {
+                    "Бела": "white",
+                    "Жолта": "yellow",
+                    "Плава": "lightblue",
+                    "Розева": "pink",
+                    "Црна": "black"
+                };
+
+                container.style.color = colorMap[value];
             }
+
 
             if (type === "textStyle") {
                 qText.classList.add(value);
@@ -105,29 +132,23 @@ class Quiz {
         if (question.type === "special" && question.special === "volume") {
             container.appendChild(qText);
 
-            if (backgroundAudio) {
-                backgroundAudio.pause();
-                backgroundAudio.remove();
-            }
-
-            backgroundAudio = document.createElement("audio");
-            backgroundAudio.src = "sounds/wind-chimes-37762.mp3";
-            backgroundAudio.loop = true;
-            backgroundAudio.autoplay = true;
-            container.appendChild(backgroundAudio);
-
             const volDiv = document.createElement("div");
             volDiv.id = "volume-control";
             volDiv.innerHTML = `
-                <label>Volume</label><br>
-                <input type="range" min="0" max="100" value="50"><br>
-                <button>Done</button>
-            `;
+        <label>Background music volume</label><br>
+        <input type="range" min="0" max="100" value="${masterVolume * 100}"><br>
+        <button>Done</button>
+    `;
             container.appendChild(volDiv);
 
             const slider = volDiv.querySelector("input");
+
             slider.addEventListener("input", () => {
-                backgroundAudio.volume = slider.value / 100;
+                masterVolume = slider.value / 100;
+
+                if (backgroundAudio) {
+                    backgroundAudio.volume = masterVolume; // 🎵 ONLY MUSIC CHANGES
+                }
             });
 
             volDiv.querySelector("button").onclick = () => {
@@ -531,6 +552,139 @@ class Quiz {
             container.appendChild(doneBtn);
             return container;
         }
+        if (question.type === "special" && question.special === "lifeSoundPick") {
+            container.appendChild(qText);
+
+            let selected = null;
+
+            question.answers.forEach(sound => {
+                const btn = document.createElement("button");
+                btn.textContent = sound.label;
+
+                btn.onclick = () => {
+                    selected = sound;
+                    [...container.querySelectorAll("button")].forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+
+                    // preview sound
+                    const preview = new Audio(sound.src);
+                    preview.volume = 0.3;
+                    preview.play();
+                };
+
+                container.appendChild(btn);
+            });
+
+            const doneBtn = document.createElement("button");
+            doneBtn.textContent = "Done";
+            doneBtn.style.marginTop = "20px";
+
+            doneBtn.onclick = () => {
+                if (!selected) {
+                    alert("Избери звук 🙂");
+                    return;
+                }
+
+                lifeSound = new Audio(selected.src);
+                lifeSound.volume=masterVolume;
+
+                container.classList.remove("visible");
+                setTimeout(() => this.showNextQuestion(container.parentElement), 300);
+            };
+
+            container.appendChild(doneBtn);
+            return container;
+        }
+        if (question.type === "special" && question.special === "correctSoundPick") {
+            container.appendChild(qText);
+
+            let selected = null;
+
+            question.answers.forEach(sound => {
+                const btn = document.createElement("button");
+                btn.textContent = sound.label;
+
+                btn.onclick = () => {
+                    selected = sound;
+                    [...container.querySelectorAll("button")].forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+
+                    // preview
+                    const preview = new Audio(sound.src);
+                    preview.volume = 0.3;
+                    preview.play();
+                };
+
+                container.appendChild(btn);
+            });
+
+            const doneBtn = document.createElement("button");
+            doneBtn.textContent = "Done";
+            doneBtn.style.marginTop = "20px";
+
+            doneBtn.onclick = () => {
+                if (!selected) {
+                    alert("Избери звук 🙂");
+                    return;
+                }
+
+                correctSound = new Audio(selected.src);
+                correctSound.volume=masterVolume;
+
+                container.classList.remove("visible");
+                setTimeout(() => this.showNextQuestion(container.parentElement), 300);
+            };
+
+            container.appendChild(doneBtn);
+            return container;
+        }
+        if (question.type === "special" && question.special === "bgMusicPick") {
+            container.appendChild(qText);
+
+            let selected = null;
+
+            question.answers.forEach(sound => {
+                const btn = document.createElement("button");
+                btn.textContent = sound.label;
+
+                btn.onclick = () => {
+                    selected = sound;
+                    [...container.querySelectorAll("button")].forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+
+                    // preview
+                    if (backgroundAudio) {
+                        backgroundAudio.pause();
+                        backgroundAudio.remove();
+                    }
+
+                    backgroundAudio = new Audio(sound.src);
+                    backgroundAudio.loop = true;
+                    backgroundAudio.volume = masterVolume;
+                    backgroundAudio.play();
+                };
+
+                container.appendChild(btn);
+            });
+
+            const doneBtn = document.createElement("button");
+            doneBtn.textContent = "Done";
+            doneBtn.style.marginTop = "20px";
+
+            doneBtn.onclick = () => {
+                if (!selected) {
+                    alert("Избери музика 🙂");
+                    return;
+                }
+
+                container.classList.remove("visible");
+                setTimeout(() => this.showNextQuestion(container.parentElement), 300);
+            };
+
+            container.appendChild(doneBtn);
+            return container;
+        }
+
 
         if (question.type === "multipleChoice") {
             container.appendChild(qText);
@@ -628,27 +782,24 @@ const game = {
 };
 
 const questions = [
+
+
+
     new Question("Кое од следниве најдобро опишува интерактивна содржина?", ["Гледање видео на слушалки", "решавање онлајн квиз со кликање одговори", "powerpoint презентација што сама се менува", "гледање филм во кино"], { correctAnswer: "решавање онлајн квиз со кликање одговори", type: "life" }),
-    new Question("Што ја прави дигиталната содржина интерактивна? ", ["Кликање", "Бирање опции", "гледање", "слушање музика"], { correctAnswer: "Бирање опции", type: "life" }),
+    new Question("Што ја прави дигиталната содржина интерактивна? ", ["Кликање", "Бирање опции", "гледање", "слушање музика"],
+        {type: "multipleChoice", correctAnswer: ["Кликање", "Бирање опции"]}),
     new Question("Дали само гледаш – или учествуваш? ", ["Гледам", "Учествувам"], { type: "none" }),
+
     new Question("Боите се основни за визуелно доживување поради реакциите на фото-рецепторите во човечкото око " +
         ", еве некои модели на боја кои постојат. RGB е адитивен модел, белата се добива со присуство на сите, додека CMY е суптрактивен, белата е отсуството на сите:", [], { type: "special", special: "colorModels" }),
-
     new Question("Каква боја сакаш да ти е позадината?", ["Бела", "Жолта", "Плава", "Розева", "Црна"], { type: "flag", flagType: "BGcolor" }),
     new Question("Каква боја сакаш да ти е позадината на прашањата?", ["Бела", "Жолта", "Плава", "Розева", "Црна"], { type: "flag", flagType: "color" }),
     new Question("Каква боја сакаш да ти е текстот?", ["Бела", "Жолта", "Плава", "Розева", "Црна"], { type: "flag", flagType: "textColor" }),
+
     new Question(
         "Кое од овие овозможува брзо пребарување и интерактивно читање? (hint: двоен клик ќе ти помогне)",
         ["Хиперлинк", "Обична веб страна", "Тетратка", "Манга"],
         { type: "special", special: "hyperlink" }
-    ),
-    new Question(
-        "Фонт претставува елемент од фамилија фонтови со? Избери ги сите точни одговори:",
-        ["Големина", "Стил", "Тежина", "Резолуција", "Позиција"],
-        {
-            type: "multipleChoice",
-            correctAnswer: ["Големина", "Стил", "Тежина"]
-        }
     ),
     new Question("Каков стил сакаш да ти има текстот?", [], { type: "special", special: "textStyle" }),
     new Question(
@@ -666,6 +817,11 @@ const questions = [
         ["Текст што варира во големина е лесен за читање", "текст што не варира е лесен за читање"],
         { type: "special", special: "variatingText" }
     ),
+
+
+
+
+
     new Question(
         "Koe од понудените е пример за линеарна мултимедија? Избери ги сите точни одговори:",
         [
@@ -677,15 +833,35 @@ const questions = [
         { type: "special", special: "imageChoice" }
     ),
 
-
-
-
-    //TODO PRASHANJA ZA ZVUK
+    new Question(
+        "Избери звук што ќе се слуша кога губиш живот:",
+        [
+            { label: "Звук 1", src: "sounds/incorrect1.mp3" },
+            { label: "Звук 2", src: "sounds/incorrect2.mp3" },
+            { label: "Звук 3", src: "sounds/incorrect3.mp3" }
+        ],
+        { type: "special", special: "lifeSoundPick" }
+    ),
+    new Question(
+        "Избери звук што ќе се слуша кога одговорот е точен:",
+        [
+            { label: "Звук 1", src: "sounds/correct1.mp3" },
+            { label: "Звук 2", src: "sounds/correct2.mp3" },
+            { label: "Звук 3", src: "sounds/correct3.mp3" }
+        ],
+        { type: "special", special: "correctSoundPick" }
+    ),
 
     new Question("Смени гласноста на звукот:", [], { type: "special", special: "volume" }),
 
-
-
+    new Question(
+        "Избери позадинска музика за квизот:",
+        [
+            { label: "Музика 1", src: "sounds/background(FINAL).mp3" },
+            { label: "Музика 2", src: "sounds/Background2(unfinished).mp3" }
+        ],
+        { type: "special", special: "bgMusicPick" }
+    ),
 
 
 
@@ -740,6 +916,13 @@ function startGame() {
 }
 
 function removeLife() {
+
+    if (lifeSound) {
+        lifeSound.currentTime = 0;
+        lifeSound.volume = 0.2;
+        lifeSound.play();
+    }
+
     const lives = [...document.getElementById("lives-box").children];
     for (let i = lives.length - 1; i >= 0; i--) {
         if (lives[i].style.display !== "none") {
@@ -750,6 +933,7 @@ function removeLife() {
     }
     if (game.lives <= 0) setTimeout(showGameOver, 400);
 }
+
 function showGameOver() {
     const screen = document.getElementById("game-over-screen");
     screen.classList.add("show");  // show overlay
@@ -764,6 +948,8 @@ function restartGame() {
         backgroundAudio.pause();
         backgroundAudio.remove();
         backgroundAudio = null;
+        correctSound=null;
+        lifeSound=null;
     }
     startGame();
 }

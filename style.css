@@ -322,7 +322,7 @@ button.active {
     animation: sizePulse 1.6s ease-in-out infinite;
 }
 
-/* 🔥 STACKED EFFECT */
+/*STACKED EFFECT */
 .moving-text.variating-text {
     animation:
             subtleMove 1.5s ease-in-out infinite,

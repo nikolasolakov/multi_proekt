@@ -434,6 +434,7 @@ class Quiz {
 
                 if (selected === "Текст што варира во големина е лесен за читање") {
                     this.context.flags.push(["variatingText", true]);
+                    this.context.removeLife();
                 }
 
                 container.classList.remove("visible");
@@ -502,6 +503,13 @@ class Quiz {
                 });
 
                 if (!allCorrect) removeLife();
+                else{
+                    if (correctSound) {
+                        correctSound.currentTime = 0;
+                        correctSound.volume = 0.2;
+                        correctSound.play();
+                    }
+                }
 
                 container.classList.remove("visible");
                 setTimeout(() => this.showNextQuestion(container.parentElement), 300);
@@ -786,7 +794,7 @@ const questions = [
 
 
     new Question("Кое од следниве најдобро опишува интерактивна содржина?", ["Гледање видео на слушалки", "решавање онлајн квиз со кликање одговори", "powerpoint презентација што сама се менува", "гледање филм во кино"], { correctAnswer: "решавање онлајн квиз со кликање одговори", type: "life" }),
-    new Question("Што ја прави дигиталната содржина интерактивна? ", ["Кликање", "Бирање опции", "гледање", "слушање музика"],
+    new Question("Што ја прави дигиталната содржина интерактивна? Избери ги сите точни одговори: ", ["Кликање", "Бирање опции", "гледање", "слушање музика"],
         {type: "multipleChoice", correctAnswer: ["Кликање", "Бирање опции"]}),
     new Question("Дали само гледаш – или учествуваш? ", ["Гледам", "Учествувам"], { type: "none" }),
 
@@ -852,7 +860,6 @@ const questions = [
         { type: "special", special: "correctSoundPick" }
     ),
 
-    new Question("Смени гласноста на звукот:", [], { type: "special", special: "volume" }),
 
     new Question(
         "Избери позадинска музика за квизот:",
@@ -863,6 +870,7 @@ const questions = [
         { type: "special", special: "bgMusicPick" }
     ),
 
+    new Question("Смени гласноста на звукот:", [], { type: "special", special: "volume" }),
 
 
     new Question("Успешно направи мултимедијален квиз! Сега неколку прашања да го испробаш твојот квиз", ["продолжи"], { type: "none" }),
